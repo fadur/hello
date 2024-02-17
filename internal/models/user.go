@@ -32,14 +32,34 @@ func (u *User) Save() error {
 }
 
 func (u *User) Update() error {
+	user := User{}
+	// check if user exists
+	err := DB.QueryRow("SELECT * FROM users WHERE id = ?", u.ID).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return err
+	}
+	// update user
+	_, err = DB.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?", u.Username, u.Email, u.Password, u.ID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (u *User) Delete() error {
+	_, err := DB.Exec("DELETE FROM users WHERE id = ?", u.ID)
+	if err != nil {
+		return err
+	}
 	return nil
+
 }
 
 func (u *User) FindByID(id int) error {
+	err := DB.QueryRow("SELECT * FROM users WHERE id = ?", id).Scan(&u.ID, &u.Username, &u.Email, &u.Password)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
